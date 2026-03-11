@@ -13,6 +13,7 @@
       align-items: center;
       height: 100vh;
       overflow: hidden;
+      flex-direction: column;
     }
 
     /* Floating hearts background */
@@ -37,7 +38,7 @@
       cursor: pointer;
       transition: transform 1s ease;
       z-index: 2;
-      animation: pulse 1.5s infinite; /* pulsing effect */
+      animation: pulse 1.5s infinite;
     }
     .heart:before,
     .heart:after {
@@ -48,21 +49,14 @@
       border-radius: 50%;
       position: absolute;
     }
-    .heart:before {
-      top: -110px;
-      left: 0;
-    }
-    .heart:after {
-      left: 110px;
-      top: 0;
-    }
+    .heart:before { top: -110px; left: 0; }
+    .heart:after { left: 110px; top: 0; }
 
-    /* Text inside heart */
     .heart-text {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) rotate(45deg); /* center + counter rotation */
+      transform: translate(-50%, -50%) rotate(45deg);
       color: #fff;
       text-align: center;
       font-size: 1.4em;
@@ -79,23 +73,57 @@
       animation: fadeIn 2s ease forwards;
       z-index: 2;
     }
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
+
     @keyframes fadeIn {
       from {opacity: 0;}
       to {opacity: 1;}
     }
 
-    /* Heart pulsing animation */
     @keyframes pulse {
       0% { transform: rotate(-45deg) scale(1); }
       50% { transform: rotate(-45deg) scale(1.1); }
       100% { transform: rotate(-45deg) scale(1); }
     }
+
+    /* Confetti styling */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      top: 0;
+      animation: fall 3s linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Replay button */
+    .replay-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background: #ff69b4;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: background 0.3s ease;
+    }
+    .replay-btn:hover {
+      background: #ff1493;
+    }
   </style>
 </head>
 <body>
+  <!-- Background music -->
+  <audio id="bg-music" autoplay loop>
+    <source src="romantic.mp3" type="audio/mpeg">
+    <!-- Place your romantic instrumental MP3 file named romantic.mp3 in the same folder -->
+  </audio>
+
   <!-- Floating hearts -->
   <div class="floating-heart" style="left:10%; animation-delay:0s;">❤️</div>
   <div class="floating-heart" style="left:30%; animation-delay:2s;">💖</div>
@@ -114,20 +142,51 @@
   <div class="birthday hidden" id="birthday">
     <h1>🎉 Happy Birthday Panda 🎉</h1>
     <p>You are the most special part of my life, and today I celebrate you with all my love. 💕</p>
+    <button class="replay-btn" id="replay">Replay Magic ✨</button>
   </div>
 
   <script>
     const heart = document.getElementById('heart');
     const birthday = document.getElementById('birthday');
+    const replayBtn = document.getElementById('replay');
+    const music = document.getElementById('bg-music');
 
     heart.addEventListener('click', () => {
-      heart.style.animation = 'none'; // stop pulsing when clicked
+      heart.style.animation = 'none';
       heart.style.transform = 'scale(0)';
       setTimeout(() => {
         heart.style.display = 'none';
         birthday.classList.remove('hidden');
+        launchConfetti();
       }, 1000);
     });
+
+    replayBtn.addEventListener('click', () => {
+      birthday.classList.add('hidden');
+      heart.style.display = 'block';
+      heart.style.transform = 'rotate(-45deg) scale(1)';
+      heart.style.animation = 'pulse 1.5s infinite';
+      launchConfetti();
+      music.currentTime = 0; // restart music
+      music.play();
+    });
+
+    function launchConfetti() {
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.backgroundColor = randomColor();
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
+      }
+    }
+
+    function randomColor() {
+      const colors = ['#ff0000','#ff69b4','#ffd700','#00ced1','#32cd32','#ff4500'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
   </script>
 </body>
 </html>
